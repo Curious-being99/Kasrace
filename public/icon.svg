@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#030712" />
+      <stop offset="50%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#020617" />
+    </linearGradient>
+    <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22d3ee" />
+      <stop offset="50%" stop-color="#06b6d4" />
+      <stop offset="100%" stop-color="#0891b2" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fde047" />
+      <stop offset="50%" stop-color="#eab308" />
+      <stop offset="100%" stop-color="#ca8a04" />
+    </linearGradient>
+    <linearGradient id="carBody" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="50%" stop-color="#818cf8" />
+      <stop offset="100%" stop-color="#c084fc" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Dark Rounded Container Background -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)" />
+  <rect width="504" height="504" x="4" y="4" rx="108" fill="none" stroke="url(#cyanGrad)" stroke-width="4" opacity="0.4" />
+
+  <!-- Speed Lines Background -->
+  <path d="M 60 140 L 452 140" stroke="url(#cyanGrad)" stroke-width="3" opacity="0.15" stroke-dasharray="20 10" />
+  <path d="M 40 256 L 472 256" stroke="url(#cyanGrad)" stroke-width="4" opacity="0.25" stroke-dasharray="40 15" />
+  <path d="M 60 372 L 452 372" stroke="url(#cyanGrad)" stroke-width="3" opacity="0.15" stroke-dasharray="30 10" />
+
+  <!-- Glowing Kaspa Diamond Logo Motif behind car -->
+  <polygon points="256,70 360,180 256,290 152,180" fill="url(#cyanGrad)" opacity="0.12" filter="url(#glow)" />
+
+  <!-- Futuristic Hypercar Front Silhouette -->
+  <g transform="translate(0, 20)">
+    <!-- Rear Wing / Spoiler -->
+    <path d="M 120 230 L 392 230 L 420 210 L 90 210 Z" fill="#0f172a" stroke="url(#cyanGrad)" stroke-width="3" />
+    
+    <!-- Car Body Base -->
+    <path d="M 90 340 Q 120 260 256 250 Q 392 260 422 340 L 440 370 Q 420 400 256 405 Q 92 400 72 370 Z" fill="url(#bgGrad)" stroke="#1e293b" stroke-width="4" />
+
+    <!-- Aerodynamic Cabin Visor -->
+    <path d="M 170 300 Q 256 265 342 300 Q 320 340 256 345 Q 192 340 170 300 Z" fill="url(#cyanGrad)" opacity="0.85" filter="url(#glow)" />
+
+    <!-- Headlights LED Strips -->
+    <path d="M 110 355 L 175 362 M 337 362 L 402 355" stroke="url(#goldGrad)" stroke-width="8" stroke-linecap="round" filter="url(#glow)" />
+
+    <!-- Lower Front Splitter -->
+    <path d="M 120 390 L 256 415 L 392 390 L 420 425 L 90 425 Z" fill="url(#goldGrad)" />
+    
+    <!-- Center Racing Stripe -->
+    <path d="M 250 250 L 262 250 L 262 410 L 250 410 Z" fill="#ffffff" opacity="0.9" />
+  </g>
+
+  <!-- Kasrace Text Accent at Bottom -->
+  <text x="256" y="475" font-family="'Rajdhani', sans-serif, system-ui" font-weight="800" font-size="40" fill="#ffffff" text-anchor="middle" letter-spacing="6">
+    KAS<tspan fill="#22d3ee">RACE</tspan>
+  </text>
+</svg>

@@ -1,0 +1,8 @@
+{
+  "name": "Kasrace - 4D Realtime Multiplayer Racing",
+  "description": "A high-speed 4D realtime multiplayer racing game with Kaspa Web3 wallet integration, PWA installer, and native Android APK build pipeline.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
