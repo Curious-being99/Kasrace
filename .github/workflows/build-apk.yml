@@ -7,6 +7,9 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build-apk:
     name: Build Kasrace Android APK
@@ -55,3 +58,27 @@ jobs:
         with:
           name: Kasrace-Android-Debug-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Update latest tag
+        if: github.event_name != 'pull_request'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -f latest "$GITHUB_SHA"
+          git push origin refs/tags/latest --force
+
+      - name: Publish Latest GitHub Release
+        if: github.event_name != 'pull_request'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Latest
+          body: |
+            Automatically published Kasrace Android debug APK from the latest successful build on the default release workflow branch.
+          files: android/app/build/outputs/apk/debug/app-debug.apk
+          overwrite_files: true
+          make_latest: true
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
