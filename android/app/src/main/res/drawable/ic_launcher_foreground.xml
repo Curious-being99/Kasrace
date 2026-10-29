@@ -6,7 +6,7 @@
     android:viewportHeight="512">
     <path android:fillColor="#052B2B" android:pathData="M256,87a91,91 0,1 0,0 182a91,91 0,1 0,0 -182" />
     <path android:fillColor="#00000000" android:strokeColor="#27E6D0" android:strokeWidth="13" android:pathData="M256,87a91,91 0,1 0,0 182a91,91 0,1 0,0 -182" />
-    <path android:fillColor="#00000000" android:strokeColor="#EAF EFD" android:strokeWidth="18" android:strokeLineCap="square" android:pathData="M256,112L256,244 M201,144L311,212 M201,212L311,144" />
+    <path android:fillColor="#00000000" android:strokeColor="#EAFFFD" android:strokeWidth="18" android:strokeLineCap="square" android:pathData="M256,112L256,244 M201,144L311,212 M201,212L311,144" />
     <path android:fillColor="#101D23" android:strokeColor="#27E6D0" android:strokeWidth="8" android:pathData="M96,330L133,279L205,248L311,248L378,279L416,330L395,378L115,378Z" />
     <path android:fillColor="#061115" android:strokeColor="#B9FFF7" android:strokeWidth="5" android:pathData="M166,282L213,259L302,259L349,282L329,319L185,319Z" />
     <path android:fillColor="#00000000" android:strokeColor="#20DDCA" android:strokeWidth="7" android:pathData="M210,259L185,319 M302,259L327,319" />
