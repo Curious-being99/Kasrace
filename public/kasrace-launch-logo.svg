@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<defs>
+ <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#07151a"/><stop offset="1" stop-color="#020609"/></linearGradient>
+ <linearGradient id="teal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#a6fff4"/><stop offset=".45" stop-color="#27e6d0"/><stop offset="1" stop-color="#008c83"/></linearGradient>
+ <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff"/><stop offset="1" stop-color="#9eb6bb"/></linearGradient>
+ <filter id="glow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<rect width="512" height="512" rx="112" fill="url(#bg)"/>
+<circle cx="256" cy="244" r="211" fill="none" stroke="url(#teal)" stroke-width="10"/>
+<circle cx="256" cy="178" r="91" fill="#052b2b" stroke="url(#teal)" stroke-width="13"/>
+<path d="M256 112v132m-55-100 110 68m-110 0 110-68" stroke="url(#metal)" stroke-width="20" stroke-linecap="square" fill="none"/>
+<g fill="none" stroke="#eafefd" stroke-width="10" opacity=".9">
+ <path d="M87 164l45 21-8 55-48-24z"/><path d="M425 164l-45 21 8 55 48-24z"/>
+</g>
+<g stroke="#24e6d1" stroke-width="6" fill="none" filter="url(#glow)">
+ <path d="M50 294h115M347 294h115M67 322h92M353 322h92"/>
+</g>
+<path d="M96 330l37-51 72-31h106l67 31 38 51-21 48H115z" fill="#101d23" stroke="url(#teal)" stroke-width="8" stroke-linejoin="round"/>
+<path d="M166 282l47-23h89l47 23-20 37H185z" fill="#061115" stroke="#b9fff7" stroke-width="5"/>
+<path d="M210 259l-25 60m116-60 25 60" stroke="#20ddca" stroke-width="7"/>
+<path d="M113 333l61 0-18 18h-49zm225 0h61l6 18h-49z" fill="#8ffff3" filter="url(#glow)"/>
+<circle cx="165" cy="369" r="28" fill="#020608" stroke="#20dfce" stroke-width="9"/><circle cx="347" cy="369" r="28" fill="#020608" stroke="#20dfce" stroke-width="9"/>
+<circle cx="165" cy="369" r="9" fill="#b8fff7"/><circle cx="347" cy="369" r="9" fill="#b8fff7"/>
+<path d="M80 410h352" stroke="#21e3d0" stroke-width="5"/>
+<text x="256" y="462" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="43" font-weight="900" font-style="italic" letter-spacing="-2" fill="url(#metal)">KAS<tspan fill="#25e4d0">RACE</tspan></text>
+</svg>
