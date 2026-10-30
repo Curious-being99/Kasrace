@@ -59,7 +59,7 @@ jobs:
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Kasrace-APK
+          name: kasrace.apk
           path: kasrace.apk
 
       - name: Update latest tag
