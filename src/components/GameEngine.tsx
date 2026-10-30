@@ -4625,15 +4625,7 @@ export default function GameEngine({
           </div>
         </div>
             </div>
-            <div className="pointer-events-auto mt-2 sm:mt-2.5 w-1/4 flex justify-start pl-3 sm:pl-6 gap-2">
-              <button
-              onClick={() => setShowMenu(true)}
-              className="px-2.5 py-1 rounded-lg border border-slate-700 hover:border-amber-500 bg-slate-900/95 text-slate-200 hover:text-white flex items-center gap-1.5 text-[10px] sm:text-[11px] font-racing font-bold tracking-wider transition-all shadow-lg active:translate-y-0.5 cursor-pointer"
-              title="Open Race Menu"
-            >
-              <Menu className="w-3 h-3 text-amber-400" />
-              <span>MENU</span>
-            </button>
+            <div className="pointer-events-auto absolute left-[calc(50%+260px)] top-3 sm:top-4 z-40">
               <button
               onClick={() => setShowMenu(true)}
               className="px-2.5 py-1 rounded-lg border border-slate-700 hover:border-amber-500 bg-slate-900/95 text-slate-200 hover:text-white flex items-center gap-1.5 text-[10px] sm:text-[11px] font-racing font-bold tracking-wider transition-all shadow-lg active:translate-y-0.5 cursor-pointer"
