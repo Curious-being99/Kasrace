@@ -4518,13 +4518,13 @@ export default function GameEngine({
           <div className="absolute top-0 left-0 right-0 z-30 flex items-start justify-between px-2 py-0 sm:px-4 sm:py-0 pointer-events-none select-none pt-safe pl-safe pr-safe">
         
         {/* Left: Rank Badge & Leaderboard Button */}
-        <div className="pointer-events-auto flex flex-col gap-1.5 shrink-0">
+        <div className="pointer-events-auto mt-2 sm:mt-2.5 flex flex-col gap-1 shrink-0">
           <button 
             onClick={() => setShowLeaderboard(!showLeaderboard)}
-            className="bg-slate-900/90 hover:bg-slate-800 text-yellow-400 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl border border-slate-700/80 backdrop-blur-md flex items-center gap-1.5 text-xs font-bold shadow-lg transition-all active:scale-95"
+            className="bg-slate-900/90 hover:bg-slate-800 text-yellow-400 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg border border-slate-700/80 backdrop-blur-md flex items-center gap-1 text-[10px] sm:text-[11px] font-bold shadow-lg transition-all active:scale-95"
           >
-            <Trophy className="w-3.5 h-3.5 text-yellow-400 shrink-0" />
-            <span className="text-[11px] sm:text-xs font-black">#{myRank}</span>
+            <Trophy className="w-3 h-3 text-yellow-400 shrink-0" />
+            <span className="text-[10px] sm:text-[11px] font-black">#{myRank}</span>
           </button>
 
           {/* Leaderboard Panel */}
@@ -4551,7 +4551,7 @@ export default function GameEngine({
         </div>
 
         {/* Center: Compact Multi-Hub (Timer, Speed, Nitro) + P2P Connect Hub Stack */}
-        <div className="flex flex-col items-center min-w-0 shrink scale-75 sm:scale-85 origin-top gap-1 bg-transparent pointer-events-auto landscape:mt-8">
+        <div className="flex flex-col items-center min-w-0 shrink scale-[0.68] sm:scale-[0.78] origin-top gap-0 bg-transparent pointer-events-auto mt-0">
           {/* P2P Connect Hub - No Gap, sits beautifully directly above the timer */}
           <div className="bg-slate-950/85 backdrop-blur-md px-3 py-1 rounded-b-xl border-x border-b border-slate-800/60 shadow-lg flex items-center gap-3 text-[10px] sm:text-xs text-slate-300 font-mono tracking-wider select-none mt-0">
             <div className="flex items-center gap-1 font-black uppercase text-cyan-400">
@@ -4650,27 +4650,27 @@ export default function GameEngine({
         </div>
 
         {/* Right: Consolidated Game Menu Button & Real-time Mini-Map */}
-        <div className="pointer-events-auto shrink-0 flex flex-col items-end gap-1.5 sm:gap-2">
+        <div className="pointer-events-auto mt-2 sm:mt-2.5 shrink-0 flex flex-col items-end gap-1 sm:gap-1.5">
           <div className="flex items-center gap-1.5">
             <button
               onClick={toggleEngineAudio}
-              className={`px-2.5 py-1.5 rounded-xl border flex items-center gap-1.5 text-xs font-racing font-bold tracking-wider transition-all shadow-lg active:translate-y-0.5 cursor-pointer ${
+              className={`px-2 py-1 rounded-lg border flex items-center gap-1 text-[10px] sm:text-[11px] font-racing font-bold tracking-wider transition-all shadow-lg active:translate-y-0.5 cursor-pointer ${
                 engineAudioActive || musicTrackActive
                   ? 'bg-slate-900/95 border-cyan-500/80 text-cyan-300'
                   : 'bg-slate-900/80 border-slate-700/80 text-slate-400'
               }`}
               title="Toggle Audio & Music"
             >
-              <Music className={`w-3.5 h-3.5 ${musicTrackActive || engineAudioActive ? 'text-cyan-400' : 'text-slate-500'}`} />
+              <Music className={`w-3 h-3 ${musicTrackActive || engineAudioActive ? 'text-cyan-400' : 'text-slate-500'}`} />
               <span className="hidden xs:inline">{musicTrackActive || engineAudioActive ? 'MUSIC: ON' : 'MUSIC: OFF'}</span>
             </button>
 
             <button
               onClick={() => setShowMenu(true)}
-              className="px-3 py-1.5 rounded-xl border border-slate-700 hover:border-amber-500 bg-slate-900/95 text-slate-200 hover:text-white flex items-center gap-2 text-xs font-racing font-bold tracking-wider transition-all shadow-lg active:translate-y-0.5 cursor-pointer"
+              className="px-2.5 py-1 rounded-lg border border-slate-700 hover:border-amber-500 bg-slate-900/95 text-slate-200 hover:text-white flex items-center gap-1.5 text-[10px] sm:text-[11px] font-racing font-bold tracking-wider transition-all shadow-lg active:translate-y-0.5 cursor-pointer"
               title="Open Race Menu"
             >
-              <Menu className="w-3.5 h-3.5 text-amber-400" />
+              <Menu className="w-3 h-3 text-amber-400" />
               <span>MENU</span>
             </button>
           </div>
