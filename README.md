@@ -135,7 +135,7 @@ This repository includes a pre-configured GitHub Actions workflow (`.github/work
 1. Push your changes to the `main` or `master` branch of your GitHub repository.
 2. Navigate to the **Actions** tab on your GitHub repository page.
 3. Click on the latest **Build Android APK** workflow run.
-4. Download the generated `Kasrace-Android-Debug-APK` artifact from the run's summary page!
+4. Download the generated `Kasrace-APK` artifact from the run's summary page (the file is named `kasrace.apk`)!
 
 ### Manual Local Compilation
 To compile the APK locally using your Android Studio environment:
