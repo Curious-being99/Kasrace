@@ -300,6 +300,11 @@ class EngineAudioSynth {
 
 const engineAudio = new EngineAudioSynth();
 
+export const startRaceBackgroundMusic = () => {
+  engineAudio.init();
+  engineAudio.setMusicEnabled(true);
+};
+
 // Shared Geometries and Materials for performance optimization (Prevents WebGL context loss)
 const BOX_GEOM = new THREE.BoxGeometry(1, 1, 1);
 const SPHERE_GEOM = new THREE.SphereGeometry(1, 12, 12);
