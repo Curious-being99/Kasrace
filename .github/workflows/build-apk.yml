@@ -40,36 +40,6 @@ jobs:
       - name: Sync Capacitor Android
         run: npx cap sync android
 
-      - name: Validate and normalize Android PNG resources
-        run: |
-          python3 -m pip install --disable-pip-version-check Pillow
-          python3 - <<'PY'
-          from pathlib import Path
-          from PIL import Image
-
-          resources = [
-              Path("android/app/src/main/res/mipmap-mdpi/ic_launcher.png"),
-              Path("android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png"),
-              Path("android/app/src/main/res/drawable/splash.png"),
-          ]
-
-          for path in resources:
-              if not path.is_file():
-                  raise SystemExit(f"Missing Android image resource: {path}")
-              try:
-                  with Image.open(path) as source:
-                      source.load()
-                      normalized = source.convert("RGBA")
-                      temporary = path.with_name(path.name + ".normalized.png")
-                      normalized.save(temporary, format="PNG", optimize=True)
-                  temporary.replace(path)
-                  with Image.open(path) as check:
-                      check.verify()
-                  print(f"Validated and normalized: {path}")
-              except Exception as error:
-                  raise SystemExit(f"Invalid Android PNG resource {path}: {error}") from error
-          PY
-
       - name: Restore Gradle Wrapper JAR
         run: |
           curl --fail --silent --show-error --location https://raw.githubusercontent.com/gradle/gradle/v8.14.3/gradle/wrapper/gradle-wrapper.jar --output android/gradle/wrapper/gradle-wrapper.jar
