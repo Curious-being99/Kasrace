@@ -42,65 +42,74 @@ jobs:
       - name: Sync Capacitor Android
         run: npx cap sync android
 
-      - name: Restore Android PNG resources from original project artwork
+      - name: Recover Android resources from valid original artwork
         run: |
           python -m pip install --disable-pip-version-check Pillow
           python - <<'PY'
-          from io import BytesIO
           from pathlib import Path
-          import shutil
           from PIL import Image
 
-          def load_valid(path):
+          def decode(path):
               try:
                   with Image.open(path) as image:
                       image.load()
                       return image.copy()
-              except Exception:
+              except Exception as error:
+                  print(f"Unavailable image source {path}: {error}")
                   return None
 
-          def save_png(image, target):
+          def first_valid(paths):
+              for path in paths:
+                  image = decode(path)
+                  if image is not None:
+                      print(f"Using original artwork: {path} ({image.size}, {image.mode})")
+                      return image, path
+              return None, None
+
+          def write_png(image, target):
               target.parent.mkdir(parents=True, exist_ok=True)
               image.save(target, format="PNG", optimize=False)
-              checked = load_valid(target)
+              checked = decode(target)
               if checked is None:
-                  raise SystemExit(f"PNG validation failed after writing {target}")
-              print(f"Validated {target}: {checked.size}, {checked.mode}")
+                  raise SystemExit(f"PNG validation failed: {target}")
+              print(f"Restored {target}: {checked.size}, {checked.mode}")
 
-          launcher_target = Path("android/app/src/main/res/mipmap-mdpi/ic_launcher.png")
-          round_target = Path("android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png")
-          splash_target = Path("android/app/src/main/res/drawable/splash.png")
-
-          launcher = load_valid(launcher_target)
+          launcher_paths = [
+              "public/icon.png",
+              "public/icon-512.png",
+              "public/icon-192.png",
+              "android/app/src/main/assets/public/icon.png",
+              "android/app/src/main/assets/public/icon-192.png",
+              "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
+              "android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png",
+              "android/app/src/main/res/mipmap-xhdpi/ic_launcher.png",
+              "android/app/src/main/res/mipmap-hdpi/ic_launcher.png",
+              "src/assets/images/app_launch_icon_1785328942765.jpg",
+          ]
+          launcher, launcher_source = first_valid(launcher_paths)
           if launcher is None:
-              source = Path("public/icon.png")
-              launcher = load_valid(source)
-              if launcher is None:
-                  raise SystemExit(f"Original project launcher artwork is missing or invalid: {source}")
-              print(f"Restoring mdpi launcher from original project artwork: {source}")
-          save_png(launcher, launcher_target)
-          save_png(launcher, round_target)
+              raise SystemExit("No decodable original KasRace launcher artwork was found; refusing to invent a replacement.")
+          write_png(launcher, Path("android/app/src/main/res/mipmap-mdpi/ic_launcher.png"))
+          write_png(launcher, Path("android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png"))
 
-          splash = load_valid(splash_target)
+          splash_paths = [
+              "android/app/src/main/res/drawable-port-mdpi/splash.png",
+              "android/app/src/main/res/drawable-land-mdpi/splash.png",
+              "android/app/src/main/res/drawable-port-hdpi/splash.png",
+              "android/app/src/main/res/drawable-land-hdpi/splash.png",
+              "android/app/src/main/res/drawable-port-xhdpi/splash.png",
+              "android/app/src/main/res/drawable-land-xhdpi/splash.png",
+              "android/app/src/main/res/drawable-port-xxhdpi/splash.png",
+              "android/app/src/main/res/drawable-land-xxhdpi/splash.png",
+              "android/app/src/main/res/drawable-port-xxxhdpi/splash.png",
+              "android/app/src/main/res/drawable-land-xxxhdpi/splash.png",
+              "public/splash.png",
+              "src/assets/images/app_launch_icon_1785328942765.jpg",
+          ]
+          splash, splash_source = first_valid(splash_paths)
           if splash is None:
-              candidates = [
-                  Path("android/app/src/main/res/drawable-port-xxxhdpi/splash.png"),
-                  Path("android/app/src/main/res/drawable-port-xxhdpi/splash.png"),
-                  Path("android/app/src/main/res/drawable-port-xhdpi/splash.png"),
-                  Path("android/app/src/main/res/drawable-port-hdpi/splash.png"),
-                  Path("android/app/src/main/res/drawable-port-mdpi/splash.png"),
-                  Path("android/app/src/main/res/drawable-land-xxxhdpi/splash.png"),
-                  Path("android/app/src/main/res/drawable-land-xxhdpi/splash.png"),
-                  Path("android/app/src/main/res/drawable-land-xhdpi/splash.png"),
-                  Path("android/app/src/main/res/drawable-land-hdpi/splash.png"),
-                  Path("android/app/src/main/res/drawable-land-mdpi/splash.png"),
-              ]
-              source = next(((path, load_valid(path)) for path in candidates if load_valid(path) is not None), None)
-              if source is None:
-                  raise SystemExit("No valid original density-specific splash artwork exists in the repository")
-              source_path, splash = source
-              print(f"Restoring default splash from original density-specific artwork: {source_path}")
-          save_png(splash, splash_target)
+              raise SystemExit("No decodable original KasRace splash artwork was found; refusing to invent a replacement.")
+          write_png(splash, Path("android/app/src/main/res/drawable/splash.png"))
           PY
 
       - name: Restore Gradle Wrapper JAR
