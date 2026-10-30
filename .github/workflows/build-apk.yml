@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   build-apk:
-    name: Build Kasrace Android APK
+    name: Build Kasrace Android Release APK
     runs-on: ubuntu-latest
 
     steps:
@@ -73,26 +73,27 @@ jobs:
             echo "ANDROID_KEY_PASSWORD=$ANDROID_KEY_PASSWORD"
           } >> "$GITHUB_ENV"
 
-      - name: Build Android Debug APK
+      - name: Build Android Release APK
         env:
           VERSION_CODE: ${{ github.run_number }}
         run: |
           cd android
-          ./gradlew assembleDebug --no-daemon -PVERSION_CODE="$VERSION_CODE" -PVERSION_NAME="1.0.$VERSION_CODE"
+          ./gradlew assembleRelease --no-daemon -PVERSION_CODE="$VERSION_CODE" -PVERSION_NAME="1.0.$VERSION_CODE"
 
-      - name: Rename APK to kasrace.apk
+      - name: Package signed release APK
         if: github.event_name != 'pull_request'
-        run: cp android/app/build/outputs/apk/debug/app-debug.apk kasrace.apk
+        run: cp android/app/build/outputs/apk/release/app-release.apk kasrace.apk
 
-      - name: Rename APK to kasrace.apk
-        run: cp android/app/build/outputs/apk/debug/app-debug.apk kasrace.apk
+      - name: Package unsigned release APK for pull request validation
+        if: github.event_name == 'pull_request'
+        run: cp android/app/build/outputs/apk/release/app-release-unsigned.apk kasrace.apk
 
       - name: Upload APK Artifact
-        if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: kasrace.apk
           path: kasrace.apk
+          if-no-files-found: error
 
       - name: Update latest tag
         if: github.event_name != 'pull_request'
@@ -109,7 +110,7 @@ jobs:
           tag_name: latest
           name: Latest
           body: |
-            Automatically published kasrace.apk from the latest successful Android build on the default release workflow branch.
+            Automatically published kasrace.apk from the latest successful Android release build.
           files: kasrace.apk
           overwrite_files: true
           make_latest: true
