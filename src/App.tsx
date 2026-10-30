@@ -689,7 +689,7 @@ export default function App() {
 
       {view !== 'game' && (
         <header
-          className="box-border w-full max-w-5xl mx-auto py-0 px-2 sm:px-4 flex justify-between items-center gap-3 z-20 transition-all shrink-0"
+          className="box-border w-full max-w-5xl mx-auto py-0 px-2 sm:px-4 flex justify-between items-center gap-2 z-20 transition-all shrink-0"
           style={{
             paddingLeft: 'calc(0.5rem + env(safe-area-inset-left, 0px))',
             paddingRight: 'calc(0.5rem + env(safe-area-inset-right, 0px))'
@@ -701,7 +701,7 @@ export default function App() {
             </h1>
           </div>
 
-          <div className="flex items-center justify-end gap-2 min-w-0 shrink-0">
+          <div className="flex items-center justify-end gap-1.5 min-w-0 shrink-0">
             <div className="hidden sm:flex shrink-0 items-center gap-2 whitespace-nowrap text-[10px] font-mono font-bold text-slate-300 bg-slate-900/90 px-2 py-1 rounded-lg border border-slate-800 shadow-sm">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
               <span className="text-slate-400">KAS:</span>
@@ -710,7 +710,7 @@ export default function App() {
 
             <button
               onClick={() => setShowWalletModal(true)}
-              className="flex min-w-0 max-w-[42vw] sm:max-w-none shrink-0 items-center gap-1.5 whitespace-nowrap bg-slate-900/90 hover:bg-slate-800 border border-[#70C7BA]/50 hover:border-[#70C7BA] px-2 py-1 rounded-lg text-[10px] font-mono font-bold text-[#70C7BA] transition-all cursor-pointer shadow-sm active:translate-y-0.5"
+              className="flex min-w-0 max-w-[42vw] sm:max-w-none shrink-0 items-center gap-1 whitespace-nowrap bg-slate-900/90 hover:bg-slate-800 border border-[#70C7BA]/50 hover:border-[#70C7BA] px-2 py-1 rounded-lg text-[9px] sm:text-[10px] leading-tight font-mono font-bold text-[#70C7BA] transition-all cursor-pointer shadow-sm active:translate-y-0.5"
             >
               <Wallet className="w-3.5 h-3.5 shrink-0 text-[#70C7BA]" />
               {walletState.isConnected ? (
