@@ -29,7 +29,9 @@ class EngineAudioSynth {
   public engineEnabled = true;
   public musicEnabled = true;
   public isScreeching = false;
-  private musicAudio: HTMLAudioElement | null = null;
+  private musicGain: GainNode | null = null;
+  private musicTimer: number | null = null;
+  private musicStep = 0;
 
   init() {
     try {
@@ -220,48 +222,80 @@ class EngineAudioSynth {
   }
 
   stopMusic() {
-    if (this.musicAudio) {
-      this.musicAudio.pause();
+    if (this.musicTimer !== null) {
+      window.clearInterval(this.musicTimer);
+      this.musicTimer = null;
+    }
+    if (this.musicGain && this.ctx) {
+      this.musicGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.08);
     }
   }
 
+  private playMusicNote(frequency: number, when: number, duration: number, waveform: OscillatorType, volume: number) {
+    if (!this.ctx || !this.musicGain) return;
+    const oscillator = this.ctx.createOscillator();
+    const envelope = this.ctx.createGain();
+    oscillator.type = waveform;
+    oscillator.frequency.setValueAtTime(frequency, when);
+    envelope.gain.setValueAtTime(0.0001, when);
+    envelope.gain.exponentialRampToValueAtTime(Math.max(0.0002, volume), when + 0.012);
+    envelope.gain.exponentialRampToValueAtTime(0.0001, when + duration);
+    oscillator.connect(envelope);
+    envelope.connect(this.musicGain);
+    oscillator.start(when);
+    oscillator.stop(when + duration + 0.025);
+  }
+
+  private scheduleMusicStep() {
+    if (!this.ctx || !this.musicGain || !this.musicEnabled || !this.enabled) return;
+    const now = this.ctx.currentTime + 0.025;
+    const step = this.musicStep % 16;
+    const beat = 0.25;
+    const melody = [76, 79, 83, 79, 74, 77, 81, 77, 72, 76, 79, 76, 74, 77, 81, 84];
+    const bass = [40, 40, 47, 40, 36, 36, 43, 36, 38, 38, 45, 38, 35, 35, 42, 35];
+    const midiHz = (note: number) => 440 * Math.pow(2, (note - 69) / 12);
+
+    if (step % 4 === 0) {
+      const kick = this.ctx.createOscillator();
+      const kickGain = this.ctx.createGain();
+      kick.type = 'sine';
+      kick.frequency.setValueAtTime(125, now);
+      kick.frequency.exponentialRampToValueAtTime(42, now + 0.13);
+      kickGain.gain.setValueAtTime(0.24, now);
+      kickGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.15);
+      kick.connect(kickGain);
+      kickGain.connect(this.musicGain);
+      kick.start(now);
+      kick.stop(now + 0.16);
+    }
+
+    if (step === 4 || step === 12) {
+      this.playMusicNote(midiHz(52), now, 0.11, 'triangle', 0.055);
+    }
+
+    if (step % 2 === 0) {
+      this.playMusicNote(midiHz(bass[step]), now, 0.19, 'sawtooth', 0.045);
+    }
+
+    this.playMusicNote(midiHz(melody[step]), now, 0.16, 'square', 0.018);
+    this.musicStep = (step + 1) % 16;
+  }
+
   playMusic() {
-    if (!this.enabled || !this.musicEnabled) return;
+    if (!this.enabled || !this.musicEnabled || !this.ctx) return;
     try {
-      if (!this.musicAudio) {
-        this.musicAudio = new Audio(window.location.origin + '/racing_music.mp3');
-        this.musicAudio.loop = true;
-        this.musicAudio.volume = 0.5;
-        this.musicAudio.addEventListener('error', () => {
-          if (this.musicAudio) {
-            const currentSrc = this.musicAudio.src;
-            if (currentSrc.includes('/racing_music.mp3')) {
-              console.log('GameEngine music fallback to /new_racing_music.mp3');
-              this.musicAudio.src = window.location.origin + '/new_racing_music.mp3';
-              this.musicAudio.play().catch(() => {});
-            } else if (currentSrc.includes('/new_racing_music.mp3')) {
-              console.log('GameEngine music fallback to /api/music');
-              this.musicAudio.src = window.location.origin + '/api/music';
-              this.musicAudio.play().catch(() => {});
-            }
-          }
-        });
+      if (this.ctx.state === 'suspended') {
+        this.ctx.resume();
       }
-      if (this.musicAudio.paused) {
-        this.musicAudio.play().catch((err) => {
-          console.warn('GameEngine music playback blocked or failed, trying fallback:', err);
-          if (this.musicAudio) {
-            const currentSrc = this.musicAudio.src;
-            if (currentSrc.includes('/racing_music.mp3')) {
-              this.musicAudio.src = window.location.origin + '/new_racing_music.mp3';
-              this.musicAudio.play().catch(() => {});
-            } else if (currentSrc.includes('/new_racing_music.mp3')) {
-              this.musicAudio.src = window.location.origin + '/api/music';
-              this.musicAudio.play().catch(() => {});
-            }
-          }
-        });
+      if (!this.musicGain) {
+        this.musicGain = this.ctx.createGain();
+        this.musicGain.gain.setValueAtTime(0, this.ctx.currentTime);
+        this.musicGain.connect(this.ctx.destination);
       }
+      if (this.musicTimer !== null) return;
+      this.musicGain.gain.setTargetAtTime(0.22, this.ctx.currentTime, 0.12);
+      this.scheduleMusicStep();
+      this.musicTimer = window.setInterval(() => this.scheduleMusicStep(), 125);
     } catch {
       // Graceful audio fallback
     }
