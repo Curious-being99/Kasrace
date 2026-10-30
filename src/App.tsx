@@ -688,7 +688,7 @@ export default function App() {
       )}
 
       {view !== 'game' && (
-        <header className="w-full max-w-5xl mx-auto py-0 px-2 sm:px-4 flex justify-between items-center z-20 transition-all shrink-0" style={{ paddingTop: 'calc(8px + env(safe-area-inset-top, 0px))', paddingLeft: 'calc(0.5rem + env(safe-area-inset-left, 0px))', paddingRight: 'calc(0.5rem + env(safe-area-inset-right, 0px))' }}>
+        <header className="w-full max-w-5xl mx-auto py-0 px-2 sm:px-4 flex justify-between items-center z-20 transition-all shrink-0">
           <div className="flex items-center gap-1">
             <h1 className="text-xl sm:text-2xl font-racing font-black tracking-tight text-white drop-shadow-md">
               KASRACE
