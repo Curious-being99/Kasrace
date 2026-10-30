@@ -149,7 +149,7 @@ npm run cap:sync
 # 3. Open the workspace in Android Studio
 npm run cap:open
 ```
-In Android Studio, click **Build > Build Bundle(s) / APK(s) > Build APK(s)**. The resulting APK will be ready at `android/app/build/outputs/apk/debug/app-debug.apk`.
+In Android Studio, click **Build > Build Bundle(s) / APK(s) > Build APK(s)**. The resulting APK will be ready at `android/app/build/outputs/apk/release/app-release.apk`.
 
 ---
 
