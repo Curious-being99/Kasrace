@@ -42,65 +42,65 @@ jobs:
       - name: Sync Capacitor Android
         run: npx cap sync android
 
-      - name: Recover and normalize Android PNG resources
+      - name: Restore Android PNG resources from original project artwork
         run: |
           python -m pip install --disable-pip-version-check Pillow
           python - <<'PY'
-          import subprocess
-          import tempfile
+          from io import BytesIO
           from pathlib import Path
+          import shutil
           from PIL import Image
-          
-          resources = [
-              "android/app/src/main/res/mipmap-mdpi/ic_launcher.png",
-              "android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png",
-              "android/app/src/main/res/drawable/splash.png",
-          ]
-          
-          def valid_png(data):
+
+          def load_valid(path):
               try:
-                  with Image.open(data) as image:
+                  with Image.open(path) as image:
                       image.load()
                       return image.copy()
               except Exception:
                   return None
-          
-          for name in resources:
-              path = Path(name)
-              try:
-                  with Image.open(path) as image:
-                      image.load()
-                      recovered = image.copy()
-              except Exception:
-                  recovered = None
-          
-              if recovered is None:
-                  commits = subprocess.check_output(
-                      ["git", "log", "--all", "--format=%H", "--", name],
-                      text=True
-                  ).splitlines()
-                  for commit in commits:
-                      result = subprocess.run(
-                          ["git", "show", f"{commit}:{name}"],
-                          stdout=subprocess.PIPE,
-                          stderr=subprocess.DEVNULL
-                      )
-                      if result.returncode == 0:
-                          from io import BytesIO
-                          recovered = valid_png(BytesIO(result.stdout))
-                          if recovered is not None:
-                              print(f"Recovered {name} from {commit}")
-                              break
-          
-              if recovered is None:
-                  raise SystemExit(
-                      f"No decodable copy of {name} exists in the checked-out Git history"
-                  )
-          
-              recovered.save(path, format="PNG", optimize=False)
-              with Image.open(path) as check:
-                  check.load()
-              print(f"Validated {name}: {recovered.size}, {recovered.mode}")
+
+          def save_png(image, target):
+              target.parent.mkdir(parents=True, exist_ok=True)
+              image.save(target, format="PNG", optimize=False)
+              checked = load_valid(target)
+              if checked is None:
+                  raise SystemExit(f"PNG validation failed after writing {target}")
+              print(f"Validated {target}: {checked.size}, {checked.mode}")
+
+          launcher_target = Path("android/app/src/main/res/mipmap-mdpi/ic_launcher.png")
+          round_target = Path("android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png")
+          splash_target = Path("android/app/src/main/res/drawable/splash.png")
+
+          launcher = load_valid(launcher_target)
+          if launcher is None:
+              source = Path("public/icon.png")
+              launcher = load_valid(source)
+              if launcher is None:
+                  raise SystemExit(f"Original project launcher artwork is missing or invalid: {source}")
+              print(f"Restoring mdpi launcher from original project artwork: {source}")
+          save_png(launcher, launcher_target)
+          save_png(launcher, round_target)
+
+          splash = load_valid(splash_target)
+          if splash is None:
+              candidates = [
+                  Path("android/app/src/main/res/drawable-port-xxxhdpi/splash.png"),
+                  Path("android/app/src/main/res/drawable-port-xxhdpi/splash.png"),
+                  Path("android/app/src/main/res/drawable-port-xhdpi/splash.png"),
+                  Path("android/app/src/main/res/drawable-port-hdpi/splash.png"),
+                  Path("android/app/src/main/res/drawable-port-mdpi/splash.png"),
+                  Path("android/app/src/main/res/drawable-land-xxxhdpi/splash.png"),
+                  Path("android/app/src/main/res/drawable-land-xxhdpi/splash.png"),
+                  Path("android/app/src/main/res/drawable-land-xhdpi/splash.png"),
+                  Path("android/app/src/main/res/drawable-land-hdpi/splash.png"),
+                  Path("android/app/src/main/res/drawable-land-mdpi/splash.png"),
+              ]
+              source = next(((path, load_valid(path)) for path in candidates if load_valid(path) is not None), None)
+              if source is None:
+                  raise SystemExit("No valid original density-specific splash artwork exists in the repository")
+              source_path, splash = source
+              print(f"Restoring default splash from original density-specific artwork: {source_path}")
+          save_png(splash, splash_target)
           PY
 
       - name: Restore Gradle Wrapper JAR
