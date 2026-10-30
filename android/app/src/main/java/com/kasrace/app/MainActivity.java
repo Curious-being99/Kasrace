@@ -40,7 +40,13 @@ public class MainActivity extends BridgeActivity {
                         initialRight + insets.right,
                         initialBottom + insets.bottom
                 );
-                return windowInsets;
+
+                int handledTypes = WindowInsetsCompat.Type.systemBars()
+                        | WindowInsetsCompat.Type.displayCutout();
+                return new WindowInsetsCompat.Builder(windowInsets)
+                        .setInsets(handledTypes, Insets.NONE)
+                        .setInsetsIgnoringVisibility(handledTypes, Insets.NONE)
+                        .build();
             });
             ViewCompat.requestApplyInsets(content);
         }
