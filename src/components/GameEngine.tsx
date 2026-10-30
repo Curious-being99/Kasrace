@@ -250,7 +250,6 @@ class EngineAudioSynth {
     if (!this.ctx || !this.musicGain || !this.musicEnabled || !this.enabled) return;
     const now = this.ctx.currentTime + 0.025;
     const step = this.musicStep % 16;
-    const beat = 0.25;
     const melody = [76, 79, 83, 79, 74, 77, 81, 77, 72, 76, 79, 76, 74, 77, 81, 84];
     const bass = [40, 40, 47, 40, 36, 36, 43, 36, 38, 38, 45, 38, 35, 35, 42, 35];
     const midiHz = (note: number) => 440 * Math.pow(2, (note - 69) / 12);
