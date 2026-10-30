@@ -18,6 +18,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -40,29 +42,65 @@ jobs:
       - name: Sync Capacitor Android
         run: npx cap sync android
 
-      - name: Normalize Android PNG resources
+      - name: Recover and normalize Android PNG resources
         run: |
           python -m pip install --disable-pip-version-check Pillow
           python - <<'PY'
+          import subprocess
+          import tempfile
           from pathlib import Path
           from PIL import Image
           
           resources = [
-              Path("android/app/src/main/res/mipmap-mdpi/ic_launcher.png"),
-              Path("android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png"),
-              Path("android/app/src/main/res/drawable/splash.png"),
+              "android/app/src/main/res/mipmap-mdpi/ic_launcher.png",
+              "android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png",
+              "android/app/src/main/res/drawable/splash.png",
           ]
           
-          for path in resources:
-              if not path.is_file():
-                  raise SystemExit(f"Missing Android image resource: {path}")
-              with Image.open(path) as source:
-                  source.load()
-                  normalized = source.convert("RGBA")
-                  normalized.save(path, format="PNG", optimize=False)
+          def valid_png(data):
+              try:
+                  with Image.open(data) as image:
+                      image.load()
+                      return image.copy()
+              except Exception:
+                  return None
+          
+          for name in resources:
+              path = Path(name)
+              try:
+                  with Image.open(path) as image:
+                      image.load()
+                      recovered = image.copy()
+              except Exception:
+                  recovered = None
+          
+              if recovered is None:
+                  commits = subprocess.check_output(
+                      ["git", "log", "--all", "--format=%H", "--", name],
+                      text=True
+                  ).splitlines()
+                  for commit in commits:
+                      result = subprocess.run(
+                          ["git", "show", f"{commit}:{name}"],
+                          stdout=subprocess.PIPE,
+                          stderr=subprocess.DEVNULL
+                      )
+                      if result.returncode == 0:
+                          from io import BytesIO
+                          recovered = valid_png(BytesIO(result.stdout))
+                          if recovered is not None:
+                              print(f"Recovered {name} from {commit}")
+                              break
+          
+              if recovered is None:
+                  raise SystemExit(
+                      f"No decodable copy of {name} exists in the checked-out Git history"
+                  )
+          
+              recovered.save(path, format="PNG", optimize=False)
               with Image.open(path) as check:
-                  check.verify()
-              print(f"Validated and re-encoded {path}")
+                  check.load()
+              print(f"Validated {name}: {recovered.size}, {recovered.mode}")
           PY
 
       - name: Restore Gradle Wrapper JAR
