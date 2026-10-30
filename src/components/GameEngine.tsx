@@ -27,11 +27,7 @@ class EngineAudioSynth {
   private mainGain: GainNode | null = null;
   public enabled = false;
   public engineEnabled = true;
-  public musicEnabled = true;
   public isScreeching = false;
-  private musicGain: GainNode | null = null;
-  private musicTimer: number | null = null;
-  private musicStep = 0;
 
   init() {
     try {
@@ -92,9 +88,6 @@ class EngineAudioSynth {
       }
 
       this.enabled = true;
-      if (this.musicEnabled) {
-        this.playMusic();
-      }
     } catch {
       // Audio fallback
     }
@@ -107,22 +100,11 @@ class EngineAudioSynth {
     }
   }
 
-  setMusicEnabled(val: boolean) {
-    this.musicEnabled = val;
-    if (val) {
-      this.playMusic();
-    } else {
-      this.stopMusic();
-    }
-  }
-
   toggleCombo(val: boolean) {
     this.enabled = val;
     this.engineEnabled = val;
-    this.musicEnabled = val;
     if (val) {
       this.init();
-      this.playMusic();
     } else {
       this.stop();
     }
@@ -132,10 +114,6 @@ class EngineAudioSynth {
     if (!this.enabled || !this.ctx || !this.mainGain || !this.turboGain || !this.exhaustFilter) return;
     if (this.ctx.state === 'suspended') {
       this.ctx.resume();
-    }
-
-    if (this.musicEnabled && this.musicAudio && this.musicAudio.paused) {
-      this.musicAudio.play().catch(() => {});
     }
 
     if (!this.engineEnabled || !this.osc1 || !this.osc2 || !this.subOsc || !this.turboOsc) {
@@ -217,87 +195,7 @@ class EngineAudioSynth {
     if (this.mainGain && this.ctx) {
       this.mainGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.1);
     }
-    this.stopMusic();
     this.enabled = false;
-  }
-
-  stopMusic() {
-    if (this.musicTimer !== null) {
-      window.clearInterval(this.musicTimer);
-      this.musicTimer = null;
-    }
-    if (this.musicGain && this.ctx) {
-      this.musicGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.08);
-    }
-  }
-
-  private playMusicNote(frequency: number, when: number, duration: number, waveform: OscillatorType, volume: number) {
-    if (!this.ctx || !this.musicGain) return;
-    const oscillator = this.ctx.createOscillator();
-    const envelope = this.ctx.createGain();
-    oscillator.type = waveform;
-    oscillator.frequency.setValueAtTime(frequency, when);
-    envelope.gain.setValueAtTime(0.0001, when);
-    envelope.gain.exponentialRampToValueAtTime(Math.max(0.0002, volume), when + 0.012);
-    envelope.gain.exponentialRampToValueAtTime(0.0001, when + duration);
-    oscillator.connect(envelope);
-    envelope.connect(this.musicGain);
-    oscillator.start(when);
-    oscillator.stop(when + duration + 0.025);
-  }
-
-  private scheduleMusicStep() {
-    if (!this.ctx || !this.musicGain || !this.musicEnabled || !this.enabled) return;
-    const now = this.ctx.currentTime + 0.025;
-    const step = this.musicStep % 16;
-    const melody = [76, 79, 83, 79, 74, 77, 81, 77, 72, 76, 79, 76, 74, 77, 81, 84];
-    const bass = [40, 40, 47, 40, 36, 36, 43, 36, 38, 38, 45, 38, 35, 35, 42, 35];
-    const midiHz = (note: number) => 440 * Math.pow(2, (note - 69) / 12);
-
-    if (step % 4 === 0) {
-      const kick = this.ctx.createOscillator();
-      const kickGain = this.ctx.createGain();
-      kick.type = 'sine';
-      kick.frequency.setValueAtTime(125, now);
-      kick.frequency.exponentialRampToValueAtTime(42, now + 0.13);
-      kickGain.gain.setValueAtTime(0.24, now);
-      kickGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.15);
-      kick.connect(kickGain);
-      kickGain.connect(this.musicGain);
-      kick.start(now);
-      kick.stop(now + 0.16);
-    }
-
-    if (step === 4 || step === 12) {
-      this.playMusicNote(midiHz(52), now, 0.11, 'triangle', 0.055);
-    }
-
-    if (step % 2 === 0) {
-      this.playMusicNote(midiHz(bass[step]), now, 0.19, 'sawtooth', 0.045);
-    }
-
-    this.playMusicNote(midiHz(melody[step]), now, 0.16, 'square', 0.018);
-    this.musicStep = (step + 1) % 16;
-  }
-
-  playMusic() {
-    if (!this.enabled || !this.musicEnabled || !this.ctx) return;
-    try {
-      if (this.ctx.state === 'suspended') {
-        this.ctx.resume();
-      }
-      if (!this.musicGain) {
-        this.musicGain = this.ctx.createGain();
-        this.musicGain.gain.setValueAtTime(0, this.ctx.currentTime);
-        this.musicGain.connect(this.ctx.destination);
-      }
-      if (this.musicTimer !== null) return;
-      this.musicGain.gain.setTargetAtTime(0.22, this.ctx.currentTime, 0.12);
-      this.scheduleMusicStep();
-      this.musicTimer = window.setInterval(() => this.scheduleMusicStep(), 125);
-    } catch {
-      // Graceful audio fallback
-    }
   }
 
   playScreech() {
@@ -335,7 +233,6 @@ const engineAudio = new EngineAudioSynth();
 
 export const startRaceBackgroundMusic = () => {
   engineAudio.init();
-  engineAudio.setMusicEnabled(true);
 };
 
 // Shared Geometries and Materials for performance optimization (Prevents WebGL context loss)
@@ -3623,7 +3520,6 @@ export default function GameEngine({
 
   // Audio Control States
   const [engineAudioActive, setEngineAudioActive] = useState(true);
-  const [musicTrackActive, setMusicTrackActive] = useState(true);
 
   // Flexible Steering Wheel State & Refs
   const steeringAngleRef = useRef<number>(0);
@@ -3633,10 +3529,9 @@ export default function GameEngine({
   const startWheelAngleRef = useRef<number>(0);
 
   const toggleComboAudio = () => {
-    const nextVal = !(engineAudioActive || musicTrackActive || audioEnabled);
+    const nextVal = !(engineAudioActive || audioEnabled);
     setAudioEnabled(nextVal);
     setEngineAudioActive(nextVal);
-    setMusicTrackActive(nextVal);
     engineAudio.toggleCombo(nextVal);
   };
 
@@ -3644,12 +3539,6 @@ export default function GameEngine({
     const nextVal = !engineAudioActive;
     setEngineAudioActive(nextVal);
     engineAudio.setEngineEnabled(nextVal);
-  };
-
-  const toggleMusicTrack = () => {
-    const nextVal = !musicTrackActive;
-    setMusicTrackActive(nextVal);
-    engineAudio.setMusicEnabled(nextVal);
   };
 
   const toggleAudio = () => {
