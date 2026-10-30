@@ -696,11 +696,12 @@ export default function App() {
             paddingRight: 'calc(0.5rem + env(safe-area-inset-right, 0px))'
           }}
         >
-          <div className="flex justify-self-end min-w-0 items-center gap-1 sm:gap-2 whitespace-nowrap text-[9px] sm:text-[10px] font-mono font-bold text-slate-300 bg-slate-900/90 px-2 py-1 rounded-lg border border-slate-800 shadow-sm">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-            <span className="text-slate-400">KAS:</span>
-            <span className="text-amber-400 font-extrabold">${kaspaPrice ? kaspaPrice.toFixed(4) : '0.1250'}</span>
+          <div className="flex items-center justify-self-end min-w-0">
+            <h1 className="text-xl sm:text-2xl font-racing font-black tracking-tight text-white drop-shadow-md whitespace-nowrap">
+              KASRACE
+            </h1>
           </div>
+
 
           <button
             type="button"
@@ -721,10 +722,10 @@ export default function App() {
             )}
           </button>
 
-          <div className="flex items-center justify-self-end min-w-0">
-            <h1 className="text-xl sm:text-2xl font-racing font-black tracking-tight text-white drop-shadow-md whitespace-nowrap">
-              KASRACE
-            </h1>
+          <div className="flex justify-self-start min-w-0 items-center gap-1 sm:gap-2 whitespace-nowrap text-[9px] sm:text-[10px] font-mono font-bold text-slate-300 bg-slate-900/90 px-2 py-1 rounded-lg border border-slate-800 shadow-sm">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+            <span className="text-slate-400">KAS:</span>
+            <span className="text-amber-400 font-extrabold">${kaspaPrice ? kaspaPrice.toFixed(4) : '0.1250'}</span>
           </div>
 
         </header>
