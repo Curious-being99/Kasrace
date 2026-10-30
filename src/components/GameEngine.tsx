@@ -4551,7 +4551,7 @@ export default function GameEngine({
         </div>
 
         {/* Center: Compact Multi-Hub (Timer, Speed, Nitro) + P2P Connect Hub Stack */}
-        <div className="flex flex-col items-center min-w-0 shrink scale-75 sm:scale-85 origin-top gap-1 bg-transparent pointer-events-auto">
+        <div className="flex flex-col items-center min-w-0 shrink scale-75 sm:scale-85 origin-top gap-1 bg-transparent pointer-events-auto landscape:mt-8">
           {/* P2P Connect Hub - No Gap, sits beautifully directly above the timer */}
           <div className="bg-slate-950/85 backdrop-blur-md px-3 py-1 rounded-b-xl border-x border-b border-slate-800/60 shadow-lg flex items-center gap-3 text-[10px] sm:text-xs text-slate-300 font-mono tracking-wider select-none mt-0">
             <div className="flex items-center gap-1 font-black uppercase text-cyan-400">
