@@ -18,6 +18,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -39,6 +41,80 @@ jobs:
 
       - name: Sync Capacitor Android
         run: npx cap sync android
+
+      - name: Recover invalid Android PNG resources from original artwork
+        run: |
+          python -m pip install --disable-pip-version-check Pillow
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+
+          def decode(path):
+              try:
+                  with Image.open(path) as image:
+                      image.load()
+                      return image.copy()
+              except Exception as error:
+                  print(f"Invalid image {path}: {error}")
+                  return None
+
+          def first_valid(paths, label):
+              for raw in paths:
+                  path = Path(raw)
+                  image = decode(path)
+                  if image is not None:
+                      print(f"Validated {label} artwork: {path} ({image.size}, {image.mode})")
+                      return image
+              raise SystemExit(f"No valid original {label} artwork found; refusing to generate substitute artwork.")
+
+          launcher = first_valid([
+              "public/icon.png",
+              "public/icon-512.png",
+              "public/icon-192.png",
+              "android/app/src/main/assets/public/icon.png",
+              "android/app/src/main/assets/public/icon-192.png",
+              "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
+              "android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png",
+              "android/app/src/main/res/mipmap-xhdpi/ic_launcher.png",
+              "android/app/src/main/res/mipmap-hdpi/ic_launcher.png",
+              "src/assets/images/app_launch_icon_1785328942765.jpg",
+          ], "launcher")
+
+          splash = first_valid([
+              "android/app/src/main/res/drawable/splash.png",
+              "android/app/src/main/res/drawable-port-mdpi/splash.png",
+              "android/app/src/main/res/drawable-land-mdpi/splash.png",
+              "android/app/src/main/res/drawable-port-hdpi/splash.png",
+              "android/app/src/main/res/drawable-land-hdpi/splash.png",
+              "android/app/src/main/res/drawable-port-xhdpi/splash.png",
+              "android/app/src/main/res/drawable-land-xhdpi/splash.png",
+              "android/app/src/main/res/drawable-port-xxhdpi/splash.png",
+              "android/app/src/main/res/drawable-land-xxhdpi/splash.png",
+              "android/app/src/main/res/drawable-port-xxxhdpi/splash.png",
+              "android/app/src/main/res/drawable-land-xxxhdpi/splash.png",
+              "public/splash.png",
+              "src/assets/images/app_launch_icon_1785328942765.jpg",
+          ], "splash")
+
+          resource_root = Path("android/app/src/main/res")
+          repaired = []
+          for target in sorted(resource_root.rglob("*.png")):
+              if target.name.startswith("ic_launcher"):
+                  source = launcher
+              elif target.name == "splash.png":
+                  source = splash
+              else:
+                  continue
+              if decode(target) is None:
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  source.save(target, format="PNG", optimize=False)
+                  if decode(target) is None:
+                      raise SystemExit(f"Repaired PNG failed validation: {target}")
+                  repaired.append(str(target))
+                  print(f"Repaired {target}")
+
+          print(f"Repaired {len(repaired)} invalid Android PNG resources.")
+          PY
 
       - name: Restore Gradle Wrapper JAR
         run: |
@@ -74,14 +150,18 @@ jobs:
           } >> "$GITHUB_ENV"
 
       - name: Build Android Release APK
+        env:
+          VERSION_CODE: ${{ github.run_number }}
         run: |
           cd android
-          ./gradlew assembleRelease --no-daemon
+          ./gradlew assembleRelease --no-daemon -PVERSION_CODE="$VERSION_CODE" -PVERSION_NAME="1.0.$VERSION_CODE"
 
-      - name: Rename APK to kasrace.apk
+      - name: Rename Release APK to kasrace.apk
+        if: github.event_name != 'pull_request'
         run: cp android/app/build/outputs/apk/release/app-release.apk kasrace.apk
 
       - name: Upload APK Artifact
+        if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: kasrace.apk
