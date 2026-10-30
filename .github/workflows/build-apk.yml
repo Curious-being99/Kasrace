@@ -42,7 +42,7 @@ jobs:
       - name: Sync Capacitor Android
         run: npx cap sync android
 
-      - name: Recover Android resources from valid original artwork
+      - name: Recover invalid Android PNG resources from original artwork
         run: |
           python -m pip install --disable-pip-version-check Pillow
           python - <<'PY'
@@ -55,26 +55,19 @@ jobs:
                       image.load()
                       return image.copy()
               except Exception as error:
-                  print(f"Unavailable image source {path}: {error}")
+                  print(f"Invalid image {path}: {error}")
                   return None
 
-          def first_valid(paths):
-              for path in paths:
+          def first_valid(paths, label):
+              for raw in paths:
+                  path = Path(raw)
                   image = decode(path)
                   if image is not None:
-                      print(f"Using original artwork: {path} ({image.size}, {image.mode})")
-                      return image, path
-              return None, None
+                      print(f"Validated {label} artwork: {path} ({image.size}, {image.mode})")
+                      return image
+              raise SystemExit(f"No valid original {label} artwork found; refusing to generate substitute artwork.")
 
-          def write_png(image, target):
-              target.parent.mkdir(parents=True, exist_ok=True)
-              image.save(target, format="PNG", optimize=False)
-              checked = decode(target)
-              if checked is None:
-                  raise SystemExit(f"PNG validation failed: {target}")
-              print(f"Restored {target}: {checked.size}, {checked.mode}")
-
-          launcher_paths = [
+          launcher = first_valid([
               "public/icon.png",
               "public/icon-512.png",
               "public/icon-192.png",
@@ -85,14 +78,10 @@ jobs:
               "android/app/src/main/res/mipmap-xhdpi/ic_launcher.png",
               "android/app/src/main/res/mipmap-hdpi/ic_launcher.png",
               "src/assets/images/app_launch_icon_1785328942765.jpg",
-          ]
-          launcher, launcher_source = first_valid(launcher_paths)
-          if launcher is None:
-              raise SystemExit("No decodable original KasRace launcher artwork was found; refusing to invent a replacement.")
-          write_png(launcher, Path("android/app/src/main/res/mipmap-mdpi/ic_launcher.png"))
-          write_png(launcher, Path("android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png"))
+          ], "launcher")
 
-          splash_paths = [
+          splash = first_valid([
+              "android/app/src/main/res/drawable/splash.png",
               "android/app/src/main/res/drawable-port-mdpi/splash.png",
               "android/app/src/main/res/drawable-land-mdpi/splash.png",
               "android/app/src/main/res/drawable-port-hdpi/splash.png",
@@ -105,11 +94,26 @@ jobs:
               "android/app/src/main/res/drawable-land-xxxhdpi/splash.png",
               "public/splash.png",
               "src/assets/images/app_launch_icon_1785328942765.jpg",
-          ]
-          splash, splash_source = first_valid(splash_paths)
-          if splash is None:
-              raise SystemExit("No decodable original KasRace splash artwork was found; refusing to invent a replacement.")
-          write_png(splash, Path("android/app/src/main/res/drawable/splash.png"))
+          ], "splash")
+
+          resource_root = Path("android/app/src/main/res")
+          repaired = []
+          for target in sorted(resource_root.rglob("*.png")):
+              if target.name.startswith("ic_launcher"):
+                  source = launcher
+              elif target.name == "splash.png":
+                  source = splash
+              else:
+                  continue
+              if decode(target) is None:
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  source.save(target, format="PNG", optimize=False)
+                  if decode(target) is None:
+                      raise SystemExit(f"Repaired PNG failed validation: {target}")
+                  repaired.append(str(target))
+                  print(f"Repaired {target}")
+
+          print(f"Repaired {len(repaired)} invalid Android PNG resources.")
           PY
 
       - name: Restore Gradle Wrapper JAR
