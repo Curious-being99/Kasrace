@@ -2,7 +2,6 @@ package com.kasrace.app;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.view.View;
 
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -17,38 +16,21 @@ public class MainActivity extends BridgeActivity {
         super.onCreate(savedInstanceState);
 
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-        getWindow().setStatusBarColor(Color.rgb(11, 15, 25));
-        getWindow().setNavigationBarColor(Color.rgb(11, 15, 25));
+        getWindow().setStatusBarColor(Color.TRANSPARENT);
+        getWindow().setNavigationBarColor(Color.TRANSPARENT);
         WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView())
                 .setAppearanceLightStatusBars(false);
 
-        View content = findViewById(android.R.id.content);
-        if (content != null) {
-            final int initialLeft = content.getPaddingLeft();
-            final int initialTop = content.getPaddingTop();
-            final int initialRight = content.getPaddingRight();
-            final int initialBottom = content.getPaddingBottom();
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content),
+                (view, windowInsets) -> {
+                    view.setPadding(0, 0, 0, 0);
 
-            ViewCompat.setOnApplyWindowInsetsListener(content, (view, windowInsets) -> {
-                Insets insets = windowInsets.getInsets(
-                        WindowInsetsCompat.Type.systemBars()
-                                | WindowInsetsCompat.Type.displayCutout()
-                );
-                view.setPadding(
-                        initialLeft + insets.left,
-                        initialTop + insets.top,
-                        initialRight + insets.right,
-                        initialBottom + insets.bottom
-                );
-
-                int handledTypes = WindowInsetsCompat.Type.systemBars()
-                        | WindowInsetsCompat.Type.displayCutout();
-                return new WindowInsetsCompat.Builder(windowInsets)
-                        .setInsets(handledTypes, Insets.NONE)
-                        .setInsetsIgnoringVisibility(handledTypes, Insets.NONE)
-                        .build();
-            });
-            ViewCompat.requestApplyInsets(content);
-        }
+                    int handledTypes = WindowInsetsCompat.Type.systemBars()
+                            | WindowInsetsCompat.Type.displayCutout();
+                    return new WindowInsetsCompat.Builder(windowInsets)
+                            .setInsets(handledTypes, Insets.NONE)
+                            .setInsetsIgnoringVisibility(handledTypes, Insets.NONE)
+                            .build();
+                });
     }
 }
