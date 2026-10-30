@@ -149,7 +149,12 @@ npm run cap:sync
 # 3. Open the workspace in Android Studio
 npm run cap:open
 ```
-In Android Studio, click **Build > Build Bundle(s) / APK(s) > Build APK(s)**. The resulting APK will be ready at `android/app/build/outputs/apk/debug/app-debug.apk`.
+In Android Studio, open **View > Tool Windows > Build Variants** and select the build variant you want:
+
+- **debug** (the default): click **Build > Build Bundle(s) / APK(s) > Build APK(s)**. The APK is created at `android/app/build/outputs/apk/debug/app-debug.apk`.
+- **release**: select **release**, then build the APK. If a signing configuration is set up, the output is `android/app/build/outputs/apk/release/app-release.apk`. Without signing configuration, Gradle produces `android/app/build/outputs/apk/release/app-release-unsigned.apk`, which must be signed before normal installation.
+
+The GitHub Actions workflow uses the configured release keystore for pushes and manual release runs. Pull-request builds use the unsigned release APK for validation only and do not publish a GitHub Release.
 
 ---
 
