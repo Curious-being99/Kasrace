@@ -4625,7 +4625,7 @@ export default function GameEngine({
           </div>
         </div>
             </div>
-            <div className="pointer-events-auto absolute left-[calc(50%+60px)] top-3 sm:top-4 z-40">
+            <div className="pointer-events-auto absolute left-[calc(50%+220px)] top-3 sm:top-4 z-40">
               <button
               onClick={() => setShowMenu(true)}
               className="px-2 py-0.5 rounded-md border border-slate-700 hover:border-amber-500 bg-slate-900/95 text-slate-200 hover:text-white flex items-center gap-1 text-[9px] sm:text-[10px] font-racing font-bold tracking-wider transition-all shadow-lg active:translate-y-0.5 cursor-pointer"
