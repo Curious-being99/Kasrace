@@ -156,12 +156,25 @@ jobs:
           cd android
           ./gradlew assembleRelease --no-daemon -PVERSION_CODE="$VERSION_CODE" -PVERSION_NAME="1.0.$VERSION_CODE"
 
-      - name: Rename Release APK to kasrace.apk
-        if: github.event_name != 'pull_request'
-        run: cp android/app/build/outputs/apk/release/app-release.apk kasrace.apk
+      - name: Prepare kasrace.apk artifact
+        run: |
+          set -euo pipefail
+          RELEASE_DIR=android/app/build/outputs/apk/release
+          if [ -s "$RELEASE_DIR/app-release.apk" ]; then
+            SOURCE_APK="$RELEASE_DIR/app-release.apk"
+            echo "Using signed release APK."
+          elif [ -s "$RELEASE_DIR/app-release-unsigned.apk" ]; then
+            SOURCE_APK="$RELEASE_DIR/app-release-unsigned.apk"
+            echo "Using unsigned release APK for pull-request validation only."
+          else
+            echo "::error::Neither signed nor unsigned release APK was produced."
+            find "$RELEASE_DIR" -maxdepth 1 -type f -print || true
+            exit 1
+          fi
+          cp "$SOURCE_APK" kasrace.apk
+          test -s kasrace.apk
 
       - name: Upload APK Artifact
-        if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: kasrace.apk
