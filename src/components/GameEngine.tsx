@@ -4515,41 +4515,21 @@ export default function GameEngine({
       {/* Top Header Bar - Always available if not in garage or explicitly hidden */}
       {!showGarage && (
         <>
-          <div className="absolute top-0 left-0 right-0 z-30 flex items-start justify-between px-2 py-0 sm:px-4 sm:py-0 pointer-events-none select-none pt-safe pl-safe pr-safe">
-        
-        {/* Left: Rank Badge & Leaderboard Button */}
-        <div className="pointer-events-auto mt-2 sm:mt-2.5 flex flex-col gap-1 shrink-0">
-          <button 
-            onClick={() => setShowLeaderboard(!showLeaderboard)}
-            className="bg-slate-900/90 hover:bg-slate-800 text-yellow-400 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg border border-slate-700/80 backdrop-blur-md flex items-center gap-1 text-[10px] sm:text-[11px] font-bold shadow-lg transition-all active:scale-95"
-          >
-            <Trophy className="w-3 h-3 text-yellow-400 shrink-0" />
-            <span className="text-[10px] sm:text-[11px] font-black">#{myRank}</span>
-          </button>
-
-          {/* Leaderboard Panel */}
-          {showLeaderboard && (
-            <div className="bg-slate-900/95 text-white p-2.5 sm:p-3.5 rounded-xl border border-slate-700/80 backdrop-blur-md w-44 sm:w-56 flex flex-col transition-all shadow-2xl animate-in fade-in duration-150">
-              <div className="text-[10px] text-slate-400 uppercase tracking-wider mb-1.5 font-bold flex items-center justify-between border-b border-slate-800 pb-1">
-                <span className="flex items-center gap-1"><Trophy className="w-3.5 h-3.5 text-yellow-400" /> Leaderboard</span>
-                <button onClick={() => setShowLeaderboard(false)} className="text-slate-400 hover:text-white font-bold text-xs px-1">✕</button>
-              </div>
-              <div className="space-y-1 max-h-36 overflow-y-auto">
-                {sortedLeaderboard.slice(0, 5).map((p, i) => (
-                  <div key={p.id} className="flex justify-between items-center text-[11px]">
-                    <span className={`${p.id === socket.id ? 'text-yellow-400 font-bold' : 'text-slate-300'} truncate max-w-[90px] sm:max-w-[120px]`}>
-                      {i+1}. {p.name}
-                    </span>
-                    <span className="font-mono text-slate-400 text-[10px]">
-                      {p.bestLapTime !== Infinity ? formatTime(p.bestLapTime) : '-'}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
+          <div className="absolute top-0 left-0 right-0 z-30 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-start px-2 sm:px-4 pointer-events-none select-none pt-safe pl-safe pr-safe">
+          <div className="pointer-events-auto mt-2 sm:mt-2.5 shrink-0 flex items-center justify-center">
+            <button
+              onClick={toggleEngineAudio}
+              className={`px-2 py-1 rounded-lg border flex items-center gap-1 text-[10px] sm:text-[11px] font-racing font-bold tracking-wider transition-all shadow-lg active:translate-y-0.5 cursor-pointer ${
+                engineAudioActive || musicTrackActive
+                  ? 'bg-slate-900/95 border-cyan-500/80 text-cyan-300'
+                  : 'bg-slate-900/80 border-slate-700/80 text-slate-400'
+              }`}
+              title="Toggle Audio & Music"
+            >
+              <Music className={`w-3 h-3 ${musicTrackActive || engineAudioActive ? 'text-cyan-400' : 'text-slate-500'}`} />
+              <span className="hidden xs:inline">{musicTrackActive || engineAudioActive ? 'MUSIC: ON' : 'MUSIC: OFF'}</span>
+            </button>
+          </div>
         {/* Center: Compact Multi-Hub (Timer, Speed, Nitro) + P2P Connect Hub Stack */}
         <div className="flex flex-col items-center min-w-0 shrink scale-[0.68] sm:scale-[0.78] origin-top gap-0 bg-transparent pointer-events-auto mt-0">
           {/* P2P Connect Hub - No Gap, sits beautifully directly above the timer */}
@@ -4649,22 +4629,17 @@ export default function GameEngine({
           </div>
         </div>
 
-        {/* Right: Consolidated Game Menu Button & Real-time Mini-Map */}
-        <div className="pointer-events-auto mt-2 sm:mt-2.5 shrink-0 flex flex-col items-end gap-1 sm:gap-1.5">
-          <div className="flex items-center gap-1.5">
-            <button
-              onClick={toggleEngineAudio}
-              className={`px-2 py-1 rounded-lg border flex items-center gap-1 text-[10px] sm:text-[11px] font-racing font-bold tracking-wider transition-all shadow-lg active:translate-y-0.5 cursor-pointer ${
-                engineAudioActive || musicTrackActive
-                  ? 'bg-slate-900/95 border-cyan-500/80 text-cyan-300'
-                  : 'bg-slate-900/80 border-slate-700/80 text-slate-400'
-              }`}
-              title="Toggle Audio & Music"
-            >
-              <Music className={`w-3 h-3 ${musicTrackActive || engineAudioActive ? 'text-cyan-400' : 'text-slate-500'}`} />
-              <span className="hidden xs:inline">{musicTrackActive || engineAudioActive ? 'MUSIC: ON' : 'MUSIC: OFF'}</span>
-            </button>
 
+          <div className="pointer-events-auto mt-2 sm:mt-2.5 shrink-0 flex items-center justify-start gap-2">
+        {/* Left: Rank Badge & Leaderboard Button */}
+        <div className="pointer-events-auto mt-2 sm:mt-2.5 flex flex-col gap-1 shrink-0">
+          <button 
+            onClick={() => setShowLeaderboard(!showLeaderboard)}
+            className="bg-slate-900/90 hover:bg-slate-800 text-yellow-400 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg border border-slate-700/80 backdrop-blur-md flex items-center gap-1 text-[10px] sm:text-[11px] font-bold shadow-lg transition-all active:scale-95"
+          >
+            <Trophy className="w-3 h-3 text-yellow-400 shrink-0" />
+            <span className="text-[10px] sm:text-[11px] font-black">#{myRank}</span>
+          </button>
             <button
               onClick={() => setShowMenu(true)}
               className="px-2.5 py-1 rounded-lg border border-slate-700 hover:border-amber-500 bg-slate-900/95 text-slate-200 hover:text-white flex items-center gap-1.5 text-[10px] sm:text-[11px] font-racing font-bold tracking-wider transition-all shadow-lg active:translate-y-0.5 cursor-pointer"
@@ -4674,6 +4649,8 @@ export default function GameEngine({
               <span>MENU</span>
             </button>
           </div>
+          </div>
+
 
           {/* Circular Real-Time Track Mini-Map Overlay */}
           <MiniMap localPlayerRef={localPlayer} players={players} myId={myId} />
