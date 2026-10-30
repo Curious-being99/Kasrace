@@ -9,7 +9,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import GameEngine from './components/GameEngine';
+import GameEngine, { startRaceBackgroundMusic } from './components/GameEngine';
 import { socket } from './services/socket';
 import { Player, CarConfig } from './types';
 import { Flag, Users, Copy, Check, Smartphone, Monitor, Wrench, Coins, Sparkles, Cpu, Wallet, Zap, RotateCcw, Download, X, ExternalLink, Music } from 'lucide-react';
@@ -621,6 +621,7 @@ export default function App() {
       }
 
       setError('');
+      startRaceBackgroundMusic();
       const res = await executeKaspaRaceEntry(walletState);
       setWalletState(res.newWalletState);
       localStorage.setItem('kaspa_wallet_state', JSON.stringify(res.newWalletState));
@@ -665,6 +666,7 @@ export default function App() {
 
   const handleLaunchGame = () => {
     if (!hasPaid) return;
+    startRaceBackgroundMusic();
     if (socket.connected) {
       socket.emit('startGame');
     } else {
