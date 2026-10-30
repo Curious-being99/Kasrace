@@ -691,7 +691,7 @@ export default function App() {
         <header
           className="relative z-40 pointer-events-auto w-full max-w-5xl mx-auto px-2 sm:px-4 pt-2 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 shrink-0"
           style={{
-            paddingTop: 'calc(0.5rem + env(safe-area-inset-top, 0px))',
+            paddingTop: 'calc(0.9rem + env(safe-area-inset-top, 0px))',
             paddingLeft: 'calc(0.5rem + env(safe-area-inset-left, 0px))',
             paddingRight: 'calc(0.5rem + env(safe-area-inset-right, 0px))'
           }}
