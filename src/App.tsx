@@ -688,35 +688,34 @@ export default function App() {
       )}
 
       {view !== 'game' && (
-        <header className="w-full max-w-5xl mx-auto py-0 px-2 sm:px-4 flex justify-between items-center z-20 transition-all shrink-0">
-          <div className="flex items-center gap-1">
-            <h1 className="text-xl sm:text-2xl font-racing font-black tracking-tight text-white drop-shadow-md">
-              KASRACE
-            </h1>
-          </div>
+        <header
+          className="relative z-20 flex w-full max-w-none shrink-0 items-center justify-between gap-3 px-3 py-2 sm:px-4"
+          style={{
+            paddingTop: 'max(0.5rem, env(safe-area-inset-top, 0px))',
+            paddingLeft: 'max(0.75rem, env(safe-area-inset-left, 0px))',
+            paddingRight: 'max(0.75rem, env(safe-area-inset-right, 0px))'
+          }}
+        >
+          <h1 className="min-w-0 shrink font-racing text-xl sm:text-2xl font-black tracking-tight text-white drop-shadow-md whitespace-nowrap">
+            KASRACE
+          </h1>
 
-          <div className="flex items-center gap-2">
-            <div className="hidden sm:flex items-center gap-2 text-[10px] font-mono font-bold text-slate-300 bg-slate-900/90 px-2 py-1 rounded-lg border border-slate-800 shadow-sm">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+          <div className="ml-auto flex min-w-0 shrink-0 items-center justify-end gap-2">
+            <div className="flex shrink-0 items-center gap-1.5 rounded-lg border border-slate-800 bg-slate-900/90 px-2 py-1 text-[10px] font-mono font-bold text-slate-300 shadow-sm whitespace-nowrap">
+              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" />
               <span className="text-slate-400">KAS:</span>
-              <span className="text-amber-400 font-extrabold">${kaspaPrice ? kaspaPrice.toFixed(4) : '0.1250'}</span>
+              <span className="font-extrabold text-amber-400">${kaspaPrice ? kaspaPrice.toFixed(4) : '0.1250'}</span>
             </div>
 
             <button
               onClick={() => setShowWalletModal(true)}
-              className="flex items-center gap-1.5 bg-slate-900/90 hover:bg-slate-800 border border-[#70C7BA]/50 hover:border-[#70C7BA] px-2 py-1 rounded-lg text-[10px] font-mono font-bold text-[#70C7BA] transition-all cursor-pointer shadow-sm active:translate-y-0.5"
+              className="flex max-w-[46vw] shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg border border-[#70C7BA]/50 bg-slate-900/90 px-2 py-1 text-[10px] font-mono font-bold text-[#70C7BA] shadow-sm transition-all hover:border-[#70C7BA] hover:bg-slate-800 active:translate-y-0.5"
             >
-              <Wallet className="w-3.5 h-3.5 text-[#70C7BA]" />
+              <Wallet className="h-3.5 w-3.5 shrink-0 text-[#70C7BA]" />
               {walletState.isConnected ? (
-                <>
-                  <span className="hidden sm:inline truncate max-w-[120px]">{walletState.address.slice(0, 8)}...</span>
-                  <span className="sm:hidden truncate">{walletState.address.slice(6, 10)}...</span>
-                </>
+                <span className="truncate">{walletState.address.slice(0, 8)}...</span>
               ) : (
-                <>
-                  <span className="hidden sm:inline tracking-tighter">CONNECT WALLET</span>
-                  <span className="sm:hidden">CONNECT</span>
-                </>
+                <span className="truncate">CONNECT WALLET</span>
               )}
             </button>
           </div>
