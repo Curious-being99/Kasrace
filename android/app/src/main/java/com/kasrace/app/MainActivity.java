@@ -3,9 +3,10 @@ package com.kasrace.app;
 import android.graphics.Color;
 import android.os.Bundle;
 
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.core.view.ViewCompat;
 
 import com.getcapacitor.BridgeActivity;
 
@@ -23,7 +24,13 @@ public class MainActivity extends BridgeActivity {
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content),
                 (view, windowInsets) -> {
                     view.setPadding(0, 0, 0, 0);
-                    return WindowInsetsCompat.CONSUMED;
+
+                    int handledTypes = WindowInsetsCompat.Type.systemBars()
+                            | WindowInsetsCompat.Type.displayCutout();
+                    return new WindowInsetsCompat.Builder(windowInsets)
+                            .setInsets(handledTypes, Insets.NONE)
+                            .setInsetsIgnoringVisibility(handledTypes, Insets.NONE)
+                            .build();
                 });
     }
 }
