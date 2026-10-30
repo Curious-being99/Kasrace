@@ -4515,8 +4515,9 @@ export default function GameEngine({
       {/* Top Header Bar - Always available if not in garage or explicitly hidden */}
       {!showGarage && (
         <>
-          <div className="absolute top-0 left-0 right-0 z-30 flex items-start justify-between px-2 py-0 sm:px-4 sm:py-0 pointer-events-none select-none pt-safe pl-safe pr-safe">
-        
+          <div className="absolute top-0 left-0 right-0 z-30 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-start px-2 sm:px-4 pointer-events-none select-none pt-safe pl-safe pr-safe">
+          <div className="pointer-events-auto mt-2 sm:mt-2.5 shrink-0 flex items-center justify-end">
+            <div className="flex flex-col gap-1 shrink-0">
         {/* Left: Rank Badge & Leaderboard Button */}
         <div className="pointer-events-auto mt-2 sm:mt-2.5 flex flex-col gap-1 shrink-0">
           <button 
@@ -4527,30 +4528,8 @@ export default function GameEngine({
             <span className="text-[10px] sm:text-[11px] font-black">#{myRank}</span>
           </button>
 
-          {/* Leaderboard Panel */}
-          {showLeaderboard && (
-            <div className="bg-slate-900/95 text-white p-2.5 sm:p-3.5 rounded-xl border border-slate-700/80 backdrop-blur-md w-44 sm:w-56 flex flex-col transition-all shadow-2xl animate-in fade-in duration-150">
-              <div className="text-[10px] text-slate-400 uppercase tracking-wider mb-1.5 font-bold flex items-center justify-between border-b border-slate-800 pb-1">
-                <span className="flex items-center gap-1"><Trophy className="w-3.5 h-3.5 text-yellow-400" /> Leaderboard</span>
-                <button onClick={() => setShowLeaderboard(false)} className="text-slate-400 hover:text-white font-bold text-xs px-1">✕</button>
-              </div>
-              <div className="space-y-1 max-h-36 overflow-y-auto">
-                {sortedLeaderboard.slice(0, 5).map((p, i) => (
-                  <div key={p.id} className="flex justify-between items-center text-[11px]">
-                    <span className={`${p.id === socket.id ? 'text-yellow-400 font-bold' : 'text-slate-300'} truncate max-w-[90px] sm:max-w-[120px]`}>
-                      {i+1}. {p.name}
-                    </span>
-                    <span className="font-mono text-slate-400 text-[10px]">
-                      {p.bestLapTime !== Infinity ? formatTime(p.bestLapTime) : '-'}
-                    </span>
-                  </div>
-                ))}
-              </div>
             </div>
-          )}
-        </div>
-
-        {/* Center: Compact Multi-Hub (Timer, Speed, Nitro) + P2P Connect Hub Stack */}
+          </div>        {/* Center: Compact Multi-Hub (Timer, Speed, Nitro) + P2P Connect Hub Stack */}
         <div className="flex flex-col items-center min-w-0 shrink scale-[0.68] sm:scale-[0.78] origin-top gap-0 bg-transparent pointer-events-auto mt-0">
           {/* P2P Connect Hub - No Gap, sits beautifully directly above the timer */}
           <div className="bg-slate-950/85 backdrop-blur-md px-3 py-1 rounded-b-xl border-x border-b border-slate-800/60 shadow-lg flex items-center gap-3 text-[10px] sm:text-xs text-slate-300 font-mono tracking-wider select-none mt-0">
@@ -4649,10 +4628,9 @@ export default function GameEngine({
           </div>
         </div>
 
-        {/* Right: Consolidated Game Menu Button & Real-time Mini-Map */}
-        <div className="pointer-events-auto mt-2 sm:mt-2.5 shrink-0 flex flex-col items-end gap-1 sm:gap-1.5">
-          <div className="flex items-center gap-1.5">
-            <button
+
+          <div className="pointer-events-auto mt-2 sm:mt-2.5 shrink-0 flex items-center justify-start gap-2">
+<button
               onClick={toggleEngineAudio}
               className={`px-2 py-1 rounded-lg border flex items-center gap-1 text-[10px] sm:text-[11px] font-racing font-bold tracking-wider transition-all shadow-lg active:translate-y-0.5 cursor-pointer ${
                 engineAudioActive || musicTrackActive
@@ -4664,7 +4642,104 @@ export default function GameEngine({
               <Music className={`w-3 h-3 ${musicTrackActive || engineAudioActive ? 'text-cyan-400' : 'text-slate-500'}`} />
               <span className="hidden xs:inline">{musicTrackActive || engineAudioActive ? 'MUSIC: ON' : 'MUSIC: OFF'}</span>
             </button>
+          </div>
+        {/* Center: Compact Multi-Hub (Timer, Speed, Nitro) + P2P Connect Hub Stack */}
+        <div className="flex flex-col items-center min-w-0 shrink scale-[0.68] sm:scale-[0.78] origin-top gap-0 bg-transparent pointer-events-auto mt-0">
+          {/* P2P Connect Hub - No Gap, sits beautifully directly above the timer */}
+          <div className="bg-slate-950/85 backdrop-blur-md px-3 py-1 rounded-b-xl border-x border-b border-slate-800/60 shadow-lg flex items-center gap-3 text-[10px] sm:text-xs text-slate-300 font-mono tracking-wider select-none mt-0">
+            <div className="flex items-center gap-1 font-black uppercase text-cyan-400">
+              <Activity className="w-3.5 h-3.5 animate-pulse text-cyan-400" />
+              <span className="hidden xs:inline text-[9px] sm:text-[10px]">NET HUB</span>
+            </div>
+            <div className="w-px h-3 bg-slate-800 hidden xs:block"></div>
+            <div className="flex items-center gap-2 sm:gap-3">
+              {/* Local player */}
+              <div className="flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.6)] animate-pulse"></span>
+                <span className="font-bold text-slate-200">YOU</span>
+              </div>
+              
+              {/* Opponent players */}
+              {Object.values(players).map(p => {
+                if (p.id === socket.id || p.id === myId) return null;
+                const isP2PConnected = activePeers.includes(p.id);
+                return (
+                  <div key={p.id} className="flex items-center gap-1.5 border-l border-slate-800 pl-2">
+                    <span className={`w-1.5 h-1.5 rounded-full ${
+                      isP2PConnected 
+                        ? 'bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.6)] animate-pulse' 
+                        : 'bg-amber-400 shadow-[0_0_6px_rgba(245,158,11,0.6)] animate-pulse'
+                    }`}></span>
+                    <span className="font-bold uppercase text-slate-300 max-w-[60px] sm:max-w-[100px] truncate">
+                      {p.name || 'PEER'}
+                    </span>
+                    <span className={`font-black text-[7px] sm:text-[8px] px-1 py-0.5 rounded leading-none ${
+                      isP2PConnected 
+                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
+                        : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                    }`}>
+                      {isP2PConnected ? 'P2P DIRECT' : 'SERVER RELAY'}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
 
+          <div className="bg-slate-900/90 text-white px-2 py-0.5 sm:px-3 sm:py-1 rounded-lg border border-slate-700/80 backdrop-blur-md flex items-center gap-2 sm:gap-3 shadow-md pointer-events-auto">
+            {/* Timer Section */}
+            <div className="text-center">
+              <div className="text-[6.5px] sm:text-[8px] text-slate-400 uppercase tracking-wider font-black leading-none mb-0.5">Time</div>
+              <div ref={timerRef} className="text-[10px] sm:text-xs font-mono font-black text-yellow-400 leading-none">
+                {formatTime(Date.now() - currentLapStart)}
+              </div>
+            </div>
+
+            <div className="w-px h-3.5 sm:h-4 bg-slate-700/80"></div>
+
+            {/* Best Lap Section */}
+            <div className="text-center">
+              <div className="text-[6.5px] sm:text-[8px] text-slate-400 uppercase tracking-wider font-black leading-none mb-0.5">Best</div>
+              <div className="text-[10px] sm:text-xs font-mono font-bold text-slate-200 leading-none">
+                {players[socket.id || '']?.bestLapTime !== Infinity ? formatTime(players[socket.id || '']?.bestLapTime || 0) : '--:--'}
+              </div>
+            </div>
+
+            <div className="w-px h-3.5 sm:h-4 bg-slate-700/80"></div>
+
+            {/* Speed Section */}
+            <div className="text-center min-w-[32px] sm:min-w-[40px]">
+              <div className="text-[6.5px] sm:text-[8px] text-slate-400 uppercase tracking-wider font-black leading-none mb-0.5">Speed</div>
+              <div className="flex items-baseline justify-center font-mono font-black text-cyan-400 leading-none">
+                <span ref={speedRef} className="text-[10px] sm:text-xs">0</span>
+                <span className="text-[5px] sm:text-[6px] text-cyan-300 ml-0.5">KMH</span>
+              </div>
+            </div>
+
+            <div className="w-px h-3.5 sm:h-4 bg-slate-700/80"></div>
+
+            {/* Nitro Section */}
+            <div className="text-center">
+              <div className="text-[6.5px] sm:text-[8px] text-slate-400 uppercase tracking-wider font-black leading-none mb-0.5">Nitro</div>
+              <div className="w-8 sm:w-10 h-1 bg-slate-950 rounded-full overflow-hidden border border-slate-800/60 mt-0.5">
+                <div 
+                  ref={nitroBarRef}
+                  className="h-full bg-cyan-400 transition-all duration-75"
+                  style={{ width: '100%' }}
+                />
+              </div>
+            </div>
+            
+            <div className="w-px h-3.5 sm:h-4 bg-slate-700/80"></div>
+
+            {/* Lap Section */}
+            <div className="text-center">
+              <div className="text-[6.5px] sm:text-[8px] text-slate-400 uppercase tracking-wider font-black leading-none mb-0.5">Lap</div>
+              <div className="text-[10px] sm:text-xs font-mono font-black text-slate-100 leading-none">
+                {laps}
+              </div>
+            </div>
+          </div>
             <button
               onClick={() => setShowMenu(true)}
               className="px-2.5 py-1 rounded-lg border border-slate-700 hover:border-amber-500 bg-slate-900/95 text-slate-200 hover:text-white flex items-center gap-1.5 text-[10px] sm:text-[11px] font-racing font-bold tracking-wider transition-all shadow-lg active:translate-y-0.5 cursor-pointer"
@@ -4673,9 +4748,7 @@ export default function GameEngine({
               <Menu className="w-3 h-3 text-amber-400" />
               <span>MENU</span>
             </button>
-          </div>
-
-          {/* Circular Real-Time Track Mini-Map Overlay */}
+          </div>          {/* Circular Real-Time Track Mini-Map Overlay */}
           <MiniMap localPlayerRef={localPlayer} players={players} myId={myId} />
         </div>
 
